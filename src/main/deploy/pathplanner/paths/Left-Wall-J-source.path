@@ -1,0 +1,66 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.059459459459459,
+        "y": 5.319510135135134
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.209033323095824,
+        "y": 6.266811271498772
+      },
+      "isLocked": false,
+      "linkedName": "Left-Wall-J"
+    },
+    {
+      "anchor": {
+        "x": 1.4526182432432433,
+        "y": 7.236570945945946
+      },
+      "prevControl": {
+        "x": 2.658192567567568,
+        "y": 6.396621621621621
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "LSourceTop"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Home",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Home"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 1.75,
+    "maxAcceleration": 1.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -54.605204155013034
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -119.62374875117399
+  },
+  "useDefaultConstraints": true
+}
