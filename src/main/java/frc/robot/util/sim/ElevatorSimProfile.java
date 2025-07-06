@@ -83,8 +83,8 @@ public class ElevatorSimProfile extends SimProfile {
         m_ElevatorSim.update(getPeriod());
 
         // Get current position and velocity of the Elevator Sim ...
-        double position_meters = m_ElevatorSim.getPositionMeters();
-        double velocity_mps = m_ElevatorSim.getVelocityMetersPerSecond();
+        double position_meters = m_ElevatorSim.getPosition();
+        double velocity_mps = m_ElevatorSim.getVelocity();
 
         // ... and set the position and velocity for the lead motor simulation
         // (Multiply elevator positon by total gearing reduction from motor to elevator)

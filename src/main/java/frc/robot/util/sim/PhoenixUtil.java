@@ -28,9 +28,9 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.function.Supplier;
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.motorsims.SimulatedBattery;
-import org.ironmaple.simulation.motorsims.SimulatedMotorController;
+//import org.ironmaple.simulation.SimulatedArena;
+//import org.ironmaple.simulation.motorsims.SimulatedBattery;
+//import org.ironmaple.simulation.motorsims.SimulatedMotorController;
 
 public final class PhoenixUtil {
     /** Attempts to run the command until no error is produced. */
@@ -43,7 +43,7 @@ public final class PhoenixUtil {
         }
     }
 
-    public static class TalonFXMotorControllerSim implements SimulatedMotorController {
+/*     public static class TalonFXMotorControllerSim implements SimulatedMotorController {
         private static int instances = 0;
         public final int id;
 
@@ -105,7 +105,7 @@ public final class PhoenixUtil {
         }
 
         return odometryTimeStamps;
-    }
+    } */
 
     /**
      *

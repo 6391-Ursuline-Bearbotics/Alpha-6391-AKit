@@ -66,9 +66,9 @@ class TalonFXSimProfile extends SimProfile {
         mMotorSim.update(getPeriod());
 
         // Get current position and velocity of the Motor Sim ...
-        final double position_rot = mMotorSim.getAngularPositionRotations();
+        final double position_rot = Units.radiansToRotations(mMotorSim.getAngularPosition());
         final double velocity_rps =
-            Units.radiansToRotations(mMotorSim.getAngularVelocityRadPerSec());
+            Units.radiansToRotations(mMotorSim.getAngularVelocity());
 
         // ... and set the position and velocity for the lead motor simulation
         simState.setRawRotorPosition(position_rot);

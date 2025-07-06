@@ -65,9 +65,9 @@ class RollerSimProfile extends SimProfile {
         m_MotorSim.update(getPeriod());
 
         // Get current position and velocity of the Motor Sim ...
-        final double position_rot = m_MotorSim.getAngularPositionRotations();
+        final double position_rot = Units.radiansToRotations(m_MotorSim.getAngularPosition());
         final double velocity_rps =
-            Units.radiansToRotations(m_MotorSim.getAngularVelocityRadPerSec());
+            Units.radiansToRotations(m_MotorSim.getAngularVelocity());
 
         // ... and set the position and velocity for the lead motor simulation
         simState.setRawRotorPosition(position_rot);

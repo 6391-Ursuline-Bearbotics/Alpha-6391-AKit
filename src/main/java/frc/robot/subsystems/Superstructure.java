@@ -55,7 +55,7 @@ public class Superstructure {
                         .until(() -> m_Arm.atPosition(armTolerance))),
                 m_Arm.setStateCommand(armState).until(() -> m_Arm.atPosition(armTolerance)),
                 () -> elevatorState != m_Elevator.getState()),
-            Commands.waitSeconds(5));
+            Commands.wait(5.0));
     }
 
     /**

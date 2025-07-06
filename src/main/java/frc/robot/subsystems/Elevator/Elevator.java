@@ -154,7 +154,7 @@ public class Elevator extends GenericMotionProfiledSubsystem<Elevator.State> {
     {
         return new SequentialCommandGroup(
             new InstantCommand(() -> homedAlert.set(true)),
-            Commands.waitSeconds(1),
+            Commands.wait(1.0),
             new InstantCommand(() -> homedAlert.set(false)));
     }
 

@@ -43,8 +43,8 @@ import frc.robot.subsystems.Elevator.*;
 import frc.robot.subsystems.Vision.*;
 import frc.robot.subsystems.drive.*;
 import frc.robot.util.WindupXboxController;
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+//import org.ironmaple.simulation.SimulatedArena;
+//import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -64,7 +64,7 @@ public class RobotContainer {
     private final LoggedDashboardChooser<Command> m_autoChooser;
 
     // Maple Sim
-    private SwerveDriveSimulation m_driveSimulation = null;
+    //private SwerveDriveSimulation m_driveSimulation = null;
 
     // AK-enabled Subsystems
     public final Drive m_drive;
@@ -91,15 +91,15 @@ public class RobotContainer {
                 m_drive =
                     new Drive(
                         new GyroIOPigeon2(),
-                        new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
-                        new ModuleIOTalonFXReal(TunerConstants.FrontRight),
-                        new ModuleIOTalonFXReal(TunerConstants.BackLeft),
-                        new ModuleIOTalonFXReal(TunerConstants.BackRight));
+                        new ModuleIOTalonFX(TunerConstants.FrontLeft),
+                        new ModuleIOTalonFX(TunerConstants.FrontRight),
+                        new ModuleIOTalonFX(TunerConstants.BackLeft),
+                        new ModuleIOTalonFX(TunerConstants.BackRight));
 
-                m_vision = new Vision(m_drive, new VisionIOQuestNav(VisionConstants.questName),
+                m_vision = new Vision(m_drive::addVisionMeasurement,
                     new VisionIOLimelight(VisionConstants.camera0Name, m_drive::getRotation),
                     new VisionIOLimelight(VisionConstants.camera1Name, m_drive::getRotation));
-                m_drive.addQuestZero(m_vision::zeroQuest);
+                //m_drive.addQuestZero(m_vision::zeroQuest);
                 m_profiledArm = new Arm(new ArmIOTalonFX(), false);
                 m_profiledElevator = new Elevator(new ElevatorIOTalonFX(), false);
                 m_profiledClimber = new Climber(new ClimberIOTalonFX(), false);
@@ -111,13 +111,14 @@ public class RobotContainer {
 
             case SIM:
                 // Sim robot, instantiate physics sim IO implementations
-                m_driveSimulation =
-                    new SwerveDriveSimulation(Drive.mapleSimConfig,
-                        new Pose2d(3, 3, new Rotation2d()));
-                SimulatedArena.getInstance().addDriveTrainSimulation(m_driveSimulation);
+                //m_driveSimulation =
+                //    new SwerveDriveSimulation(Drive.mapleSimConfig,
+                //        new Pose2d(3, 3, new Rotation2d()));
+                //SimulatedArena.getInstance().addDriveTrainSimulation(m_driveSimulation);
                 m_drive =
                     new Drive(
-                        new GyroIOSim(this.m_driveSimulation.getGyroSimulation()),
+                        //new GyroIOSim(this.m_driveSimulation.getGyroSimulation()),
+                        new GyroIO() {},
                         new ModuleIOSim(TunerConstants.FrontLeft),
                         new ModuleIOSim(TunerConstants.FrontRight),
                         new ModuleIOSim(TunerConstants.BackLeft),
@@ -130,8 +131,8 @@ public class RobotContainer {
                 m_ClawRollerDS = new ClawRollerDS(new ClawRollerDSIOSim());
                 m_ClimberDS = new ClimberDS(new ClimberDSIOSim());
 
-                m_vision = new Vision(m_drive);
-                m_drive.addQuestZero(m_vision::zeroQuest);
+                m_vision = new Vision(m_drive::addVisionMeasurement);
+                //m_drive.addQuestZero(m_vision::zeroQuest);
                 break;
 
             default:
@@ -151,8 +152,8 @@ public class RobotContainer {
                 m_ClawRollerDS = new ClawRollerDS(new ClawRollerDSIO() {});
                 m_ClimberDS = new ClimberDS(new ClimberDSIO() {});
 
-                m_vision = new Vision(m_drive);
-                m_drive.addQuestZero(m_vision::zeroQuest);
+                m_vision = new Vision(m_drive::addVisionMeasurement);
+                //m_drive.addQuestZero(m_vision::zeroQuest);
                 break;
         }
 
@@ -240,12 +241,12 @@ public class RobotContainer {
 
         // Reset gyro to 0° when start button is pressed
         final Runnable resetGyro =
-            Constants.currentMode == Constants.Mode.SIM
-                ? () -> m_drive.setPose(
-                    m_driveSimulation
-                        .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during
+            //Constants.currentMode == Constants.Mode.SIM
+                //? () -> m_drive.setPose(
+                    //m_driveSimulation
+                    //    .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during
                 // simulation
-                : () -> m_drive.setPose(
+                () -> m_drive.setPose(
                     new Pose2d(m_drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
         m_driver.start().onTrue(Commands.runOnce(resetGyro, m_drive).ignoringDisable(true));
 
@@ -328,7 +329,7 @@ public class RobotContainer {
                     Elevator.State.CORAL_INTAKE))
                 .andThen(Commands.waitUntil(m_ClawRollerDS.triggered))
                 .andThen(() -> rumbleReady = true)
-                .andThen(Commands.waitSeconds(0.25))
+                .andThen(Commands.wait(0.25))
                 .andThen(m_clawRoller.setStateCommand(ClawRoller.State.HOLDCORAL))
                 .andThen(m_superStruct.getTransitionCommand(Arm.State.LEVEL_2,
                     Elevator.State.LEVEL_2)));
@@ -367,7 +368,7 @@ public class RobotContainer {
                 .andThen(Commands.runOnce(() -> speedMultiplier = 1.0))
                 .andThen(Commands.waitUntil(m_ClawRollerDS.triggered))
                 .andThen(() -> rumbleReady = true)
-                .andThen(Commands.waitSeconds(0.25))
+                .andThen(Commands.wait(0.25))
                 .andThen(m_clawRoller.setStateCommand(ClawRoller.State.HOLDCORAL))
                 .andThen(m_superStruct.getTransitionCommand(Arm.State.LEVEL_2,
                     Elevator.State.LEVEL_2)));
@@ -390,7 +391,7 @@ public class RobotContainer {
                     Elevator.State.CORAL_INTAKE))
                 .andThen(Commands.waitUntil(m_ClawRollerDS.triggered))
                 .andThen(() -> rumbleReady = true)
-                .andThen(Commands.waitSeconds(0.25))
+                .andThen(Commands.wait(0.25))
                 .andThen(m_clawRoller.setStateCommand(ClawRoller.State.HOLDCORAL))
                 .andThen(m_superStruct.getTransitionCommand(Arm.State.LEVEL_2,
                     Elevator.State.LEVEL_2)));
@@ -424,7 +425,7 @@ public class RobotContainer {
                 .andThen(Commands.runOnce(() -> speedMultiplier = 1.0))
                 .andThen(Commands.waitUntil(m_ClawRollerDS.triggered))
                 .andThen(() -> rumbleReady = true)
-                .andThen(Commands.waitSeconds(0.25))
+                .andThen(Commands.wait(0.25))
                 .andThen(m_clawRoller.setStateCommand(ClawRoller.State.HOLDCORAL))
                 .andThen(m_superStruct.getTransitionCommand(Arm.State.LEVEL_2,
                     Elevator.State.LEVEL_2)));
@@ -512,7 +513,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("Intake",
             m_clawRoller.setStateCommand(ClawRoller.State.INTAKE)
                 .andThen(Commands.waitUntil(m_ClawRollerDS.triggered))
-                .andThen(Commands.waitSeconds(0.25))
+                .andThen(Commands.wait(0.25))
                 .andThen(m_clawRoller.setStateCommand(ClawRoller.State.HOLDCORAL)));
 
         // Score Coral on L4
@@ -555,7 +556,7 @@ public class RobotContainer {
             return;
 
         m_drive.setPose(new Pose2d(3, 3, new Rotation2d()));
-        SimulatedArena.getInstance().resetFieldForAuto();
+        //SimulatedArena.getInstance().resetFieldForAuto();
     }
 
     public void resetSimulationField()
@@ -571,13 +572,13 @@ public class RobotContainer {
 
         // SimulatedArena.getInstance().addGamePiece(new ReefscapeAlgaeOnField(new Translation2d(2,
         // 2)));
-        Logger.recordOutput(
+        /* Logger.recordOutput(
             "FieldSimulation/RobotPosition", m_driveSimulation.getSimulatedDriveTrainPose());
         Logger.recordOutput(
             "FieldSimulation/Coral",
             SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
         Logger.recordOutput(
             "FieldSimulation/Algae",
-            SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+            SimulatedArena.getInstance().getGamePiecesArrayByType("Algae")); */
     }
 }

@@ -28,7 +28,7 @@ import frc.robot.util.Elastic;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.ironmaple.simulation.SimulatedArena;
+//import org.ironmaple.simulation.SimulatedArena;
 import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -263,7 +263,7 @@ public class Robot extends LoggedRobot {
     @Override
     public void simulationPeriodic()
     {
-        SimulatedArena.getInstance().simulationPeriodic();
-        m_robotContainer.displaySimFieldToAdvantageScope();
+        //SimulatedArena.getInstance().simulationPeriodic();
+        //m_robotContainer.displaySimFieldToAdvantageScope();
     }
 }

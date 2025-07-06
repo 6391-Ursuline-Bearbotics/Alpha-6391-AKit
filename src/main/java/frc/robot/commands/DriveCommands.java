@@ -114,8 +114,7 @@ public class DriveCommands {
                     DriverStation.getAlliance().isPresent()
                         && DriverStation.getAlliance().get() == Alliance.Red;
                 drive.runVelocity(
-                    ChassisSpeeds.fromFieldRelativeSpeeds(
-                        speeds,
+                    speeds.toRobotRelative(
                         isFlipped
                             ? drive.getRotation().plus(new Rotation2d(Math.PI))
                             : drive.getRotation()));
@@ -143,8 +142,7 @@ public class DriveCommands {
                         ySupplier.getAsDouble() * drive.getMaxLinearSpeedMetersPerSec(),
                         omegaSupplier.getAsDouble() * drive.getMaxAngularSpeedRadPerSec());
                 drive.runVelocity(
-                    ChassisSpeeds.fromRobotRelativeSpeeds(
-                        speeds,
+                    speeds.toRobotRelative(
                         new Rotation2d(omegaSupplier.getAsDouble())));
             },
             drive);
@@ -195,8 +193,7 @@ public class DriveCommands {
                     DriverStation.getAlliance().isPresent()
                         && DriverStation.getAlliance().get() == Alliance.Red;
                 drive.runVelocity(
-                    ChassisSpeeds.fromFieldRelativeSpeeds(
-                        speeds,
+                    speeds.toRobotRelative(
                         isFlipped
                             ? drive.getRotation().plus(new Rotation2d(Math.PI))
                             : drive.getRotation()));
@@ -290,8 +287,7 @@ public class DriveCommands {
                         linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                         omega);
                 drive.runVelocity(
-                    ChassisSpeeds.fromFieldRelativeSpeeds(
-                        speeds,
+                    speeds.toRobotRelative(
                         drive.getRotation()));
             },
             drive)
@@ -392,7 +388,7 @@ public class DriveCommands {
             // Measurement sequence
             Commands.sequence(
                 // Wait for modules to fully orient before starting measurement
-                Commands.waitSeconds(1.0),
+                Commands.wait(1.0),
 
                 // Record starting measurement
                 Commands.runOnce(

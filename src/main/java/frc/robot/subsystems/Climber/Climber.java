@@ -54,7 +54,7 @@ public class Climber extends GenericMotionProfiledSubsystem<Climber.State> {
     {
         return new SequentialCommandGroup(
             new InstantCommand(() -> climbedAlert.set(true)),
-            Commands.waitSeconds(1),
+            Commands.wait(1.0),
             new InstantCommand(() -> climbedAlert.set(false)));
     }
 

@@ -85,8 +85,8 @@ public class ArmSimProfile extends SimProfile {
         m_ArmSim.update(getPeriod());
 
         // Get current position and velocity of the Arm Sim ...
-        final double position_rot = Units.radiansToRotations(m_ArmSim.getAngleRads());
-        final double velocity_rps = Units.radiansToRotations(m_ArmSim.getVelocityRadPerSec());
+        final double position_rot = Units.radiansToRotations(m_ArmSim.getAngle());
+        final double velocity_rps = Units.radiansToRotations(m_ArmSim.getVelocity());
 
         // ... and set the position and velocity for the lead motor simulation
         simState.setRawRotorPosition(position_rot * m_ArmConst.kArmReduction);

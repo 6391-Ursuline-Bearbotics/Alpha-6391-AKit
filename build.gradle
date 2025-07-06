@@ -1,6 +1,9 @@
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO2027" version "2027.0.0-alpha-1"
+    id "com.peterabeles.gversion" version "1.10"
+    id "com.diffplug.spotless" version "6.12.0"
+    id "io.freefair.lombok" version "8.6"
 }
 
 java {
@@ -33,7 +36,7 @@ deploy {
                 frcStaticFileDeploy(getArtifactTypeClass('FileTreeArtifact')) {
                     files = project.fileTree('src/main/deploy')
                     directory = '/home/systemcore/deploy'
-                    deleteOldFiles = false // Change to true to delete files on systemcore that no
+                    deleteOldFiles = true // Change to true to delete files on systemcore that no
                                            // longer exist in deploy directory of this project
                 }
             }
@@ -72,6 +75,9 @@ dependencies {
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
+    annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
 }
 
 test {
