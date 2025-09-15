@@ -7,11 +7,13 @@
 
 package frc.robot.util.drivers;
 
+import com.ctre.phoenix6.CANBus;
+
 public class CanDeviceId {
     private final int deviceNumber;
-    private final String bus;
+    private final CANBus bus;
 
-    public CanDeviceId(int deviceNumber, String bus)
+    public CanDeviceId(int deviceNumber, CANBus bus)
     {
         this.deviceNumber = deviceNumber;
         this.bus = bus;
@@ -20,7 +22,7 @@ public class CanDeviceId {
     // Use the default bus name "rio".
     public CanDeviceId(int deviceNumber)
     {
-        this(deviceNumber, "rio");
+        this(deviceNumber, CANBus.systemCore(0));
     }
 
     public int getDeviceNumber()
@@ -28,7 +30,7 @@ public class CanDeviceId {
         return deviceNumber;
     }
 
-    public String getBus()
+    public CANBus getBus()
     {
         return bus;
     }
