@@ -43,8 +43,8 @@ public class DriveCommands {
     private static final double DEADBAND = 0.1;
     private static final double ANGLE_KP = 5.0;
     private static final double ANGLE_KD = 0.4;
-    private static final double ANGLE_MAX_VELOCITY = 8.0;
-    private static final double ANGLE_MAX_ACCELERATION = 20.0;
+    private static final double ANGLE_MAX_VELOCITY = 6.0; //8 
+    private static final double ANGLE_MAX_ACCELERATION = 16.0; //20
     private static final double FF_START_DELAY = 2.0; // Secs
     private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
     private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
@@ -102,14 +102,14 @@ public class DriveCommands {
                 double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
 
                 // Square rotation value for more precise control
-                omega = Math.copySign(omega * omega, omega);
+                omega = Math.copySign(omega, omega); //omega^2
 
                 // Convert to field relative speeds & send command
                 ChassisSpeeds speeds =
                     new ChassisSpeeds(
                         linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
                         linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                        omega * drive.getMaxAngularSpeedRadPerSec() * 0.5);
+                        omega * drive.getMaxAngularSpeedRadPerSec() * 0.65);
                 boolean isFlipped =
                     DriverStation.getAlliance().isPresent()
                         && DriverStation.getAlliance().get() == Alliance.Red;

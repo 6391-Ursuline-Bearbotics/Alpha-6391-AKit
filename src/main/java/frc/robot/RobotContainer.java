@@ -203,16 +203,16 @@ public class RobotContainer {
             m_drive,
             () -> -m_driver.getLeftY() * speedScalar.get(),
             () -> -m_driver.getLeftX() * speedScalar.get(),
-            () -> -m_driver.getRightX() * 0.75);
+            () -> -m_driver.getRightX() * 0.65); //.75
     }
 
     private Command joystickDriveAtAngle(Supplier<Rotation2d> angle)
     {
         return DriveCommands.joystickDriveAtAngle(
             m_drive,
-            () -> -m_driver.getLeftY() * speedMultiplier,
-            () -> -m_driver.getLeftX() * speedMultiplier,
-            angle);
+            () -> -m_driver.getLeftY() * .5,
+            () -> -m_driver.getLeftX() * .5,
+            angle); //removed * speedMultiplier
     }
 
     private Command joystickApproach(Supplier<Pose2d> approachPose)
