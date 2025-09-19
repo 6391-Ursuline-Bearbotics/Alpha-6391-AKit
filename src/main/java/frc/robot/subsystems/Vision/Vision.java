@@ -39,7 +39,7 @@ public class Vision extends SubsystemBase {
     public boolean visionHasTarget = false;
     public boolean hasNewTarget = false;
     private boolean seesThisTarget = false;
-    private boolean useLeft = false;
+    private double shiftTrust = 1.0;
     private Pose2d pose = new Pose2d();
 
     public Vision(VisionConsumer consumer, VisionIO... io)
@@ -170,8 +170,23 @@ public class Vision extends SubsystemBase {
                 double linearStdDev = linearStdDevBaseline *
                     stdDevFactor;
                 if (cameraIndex < cameraStdDevFactors.length) {
-                    linearStdDev *=
-                        cameraStdDevFactors[cameraIndex];
+                    if (shiftTrust < 0) {
+                        if (cameraIndex == 0) {
+                            linearStdDev *=
+                            cameraStdDevFactors[cameraIndex] * (1/Math.abs(shiftTrust));
+                        } else {
+                            linearStdDev *=
+                            cameraStdDevFactors[cameraIndex];
+                        }
+                    } else {
+                        if (cameraIndex == 1) {
+                            linearStdDev *=
+                            cameraStdDevFactors[cameraIndex] * (1/Math.abs(shiftTrust));
+                        } else {
+                            linearStdDev *=
+                            cameraStdDevFactors[cameraIndex];
+                        }
+                    }
                 }
 
                 if (cameraIndex != 0) {
@@ -226,8 +241,10 @@ public class Vision extends SubsystemBase {
         return pose;
     }
 
-    public void useLeft(boolean left)
+    // Positive numbers |<1| mean to trust the right camera less as that percentage
+    // -0.5 would mean trust the left camera at 50%
+    public void shiftTrust(double trust)
     {
-        useLeft = left;
+        shiftTrust = trust;
     }
 }

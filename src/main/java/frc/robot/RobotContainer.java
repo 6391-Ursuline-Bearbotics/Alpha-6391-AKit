@@ -252,21 +252,23 @@ public class RobotContainer {
 
         // Driver Right Bumper: Approach Nearest Right-Side Reef Branch
         m_driver.rightBumper().and(() -> !m_profiledElevator.isAlgae())
-            .whileTrue(Commands.runOnce(() -> m_vision.useLeft(true)).andThen(Commands.either(
+            .whileTrue(Commands.runOnce(() -> m_vision.shiftTrust(0.5)).andThen(Commands.either(
                 joystickApproach(
                     () -> FieldConstants.getNearestReefBranch(m_drive.getPose(), ReefSide.RIGHT)),
                 joystickDriveAtAngle(
                     () -> FieldConstants.getNearestCoralStation(m_drive.getPose()).getRotation()),
-                m_ClawRollerDS.triggered)));
+                m_ClawRollerDS.triggered)))
+            .onFalse(Commands.runOnce(() -> m_vision.shiftTrust(1.0)));
 
         // Driver Left Bumper: Approach Nearest Left-Side Reef Branch
         m_driver.leftBumper().and(() -> !m_profiledElevator.isAlgae())
-            .whileTrue(Commands.runOnce(() -> m_vision.useLeft(false)).andThen(Commands.either(
+            .whileTrue(Commands.runOnce(() -> m_vision.shiftTrust(-0.5)).andThen(Commands.either(
                 joystickApproach(
                     () -> FieldConstants.getNearestReefBranch(m_drive.getPose(), ReefSide.LEFT)),
                 joystickDriveAtAngle(
                     () -> FieldConstants.getNearestCoralStation(m_drive.getPose()).getRotation()),
-                m_ClawRollerDS.triggered)));
+                m_ClawRollerDS.triggered)))
+            .onFalse(Commands.runOnce(() -> m_vision.shiftTrust(1.0)));
 
         // Driver Right Bumper and Algae mode: Approach Nearest Reef Face
         m_driver.rightBumper().or(m_driver.leftBumper()).and(() -> m_profiledElevator.isAlgae())
@@ -529,12 +531,14 @@ public class RobotContainer {
             m_clawRoller.setStateCommand(ClawRoller.State.SCORE));
 
         NamedCommands.registerCommand("ApproachRight",
-            Commands.runOnce(() -> m_vision.useLeft(true)).andThen(autoApproach(
-                () -> FieldConstants.getNearestReefBranch(m_drive.getPose(), ReefSide.RIGHT))));
+            Commands.runOnce(() -> m_vision.shiftTrust(0.5)).andThen(autoApproach(
+                () -> FieldConstants.getNearestReefBranch(m_drive.getPose(), ReefSide.RIGHT)))
+                .andThen(Commands.runOnce(() -> m_vision.shiftTrust(1.0))));
 
         NamedCommands.registerCommand("ApproachLeft",
-            Commands.runOnce(() -> m_vision.useLeft(false)).andThen(autoApproach(
-                () -> FieldConstants.getNearestReefBranch(m_drive.getPose(), ReefSide.LEFT))));
+            Commands.runOnce(() -> m_vision.shiftTrust(-0.5)).andThen(autoApproach(
+                () -> FieldConstants.getNearestReefBranch(m_drive.getPose(), ReefSide.LEFT)))
+                .andThen(Commands.runOnce(() -> m_vision.shiftTrust(1.0))));
     }
 
     /**
