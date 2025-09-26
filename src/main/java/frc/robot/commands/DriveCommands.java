@@ -237,6 +237,7 @@ public class DriveCommands {
                 20,
                 8);
         alignController.setGoal(0);
+        alignController.setTolerance(0.02, 0.05);
 
         // Construct command
         return Commands.run(
@@ -247,17 +248,22 @@ public class DriveCommands {
                 Translation2d approachTranslation = approachPose.getTranslation();
                 Rotation2d approachRotation = approachPose.getRotation();
 
+                alignController.updatePID();
+
                 Translation2d errorInApproachFrame = robotPoseNow.getTranslation()
                     .minus(approachTranslation)
                     .rotateBy(approachRotation.unaryMinus());
                 double lateralError = errorInApproachFrame.getY();
                 Logger.recordOutput("AlignDebug/lateralError", lateralError);
 
-                double lateralCommand =
-                    MathUtil.applyDeadband(alignController.calculate(lateralError), 0.05);
-                if (Math.abs(lateralCommand) < 1e-4) {
-                    alignController.reset(lateralError);
+                double rawLateralCommand = alignController.calculate(lateralError, 0.0);
+                boolean lateralAtGoal = alignController.atGoal();
+                double lateralCommand = MathUtil.applyDeadband(rawLateralCommand, 0.02);
+                if (lateralAtGoal) {
+                    lateralCommand = 0.0;
                 }
+                Logger.recordOutput("AlignDebug/lateralCommandRaw", rawLateralCommand);
+                Logger.recordOutput("AlignDebug/lateralAtGoal", lateralAtGoal);
                 Logger.recordOutput("AlignDebug/lateralCommand", lateralCommand);
 
                 Rotation2d lateralDirection = approachRotation.rotateBy(Rotation2d.kCCW_90deg);
