@@ -263,7 +263,7 @@ public class DriveCommands {
                     new Translation2d(alignController.calculate(distanceToGoal), 0)
                         .rotateBy(robotToGoal.getAngle());
 
-                Logger.recordOutput("AlignDebug/Current", distanceToGoal);
+                Logger.recordOutput("AlignDebug/distanceToGoal", distanceToGoal);
 
                 // Calculate total linear velocity
                 Translation2d linearVelocity =
@@ -272,7 +272,15 @@ public class DriveCommands {
                             approachSupplier.get().getRotation()).rotateBy(Rotation2d.kCCW_90deg)
                             .plus(offsetVector);
 
-                Logger.recordOutput("AlignDebug/approachTarget", approachTranslation);
+                // To reduce oscillation when not moving we eliminate close x movement
+                Logger.recordOutput("AlignDebug/linearVelocityIN", linearVelocity);
+                if (Math.abs(linearVelocity.getY()) < 0.4) {
+                    Logger.recordOutput("AlignDebug/linearVY", linearVelocity.getY());
+                    if (Math.abs(linearVelocity.getX()) < 0.4) {
+                        linearVelocity = new Translation2d(0, linearVelocity.getY());
+                    }
+                }                
+                Logger.recordOutput("AlignDebug/linearVelocityOUT", linearVelocity);
 
                 // Calculate angular speed
                 double omega =
