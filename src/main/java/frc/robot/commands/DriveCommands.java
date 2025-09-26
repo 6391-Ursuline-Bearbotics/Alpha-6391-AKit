@@ -242,51 +242,40 @@ public class DriveCommands {
         return Commands.run(
             () -> {
                 currentDriveMode = DriveMode.dmApproach;
-                // Name constants
-                Translation2d currentTranslation = robotPose.get().getTranslation();
-                Translation2d approachTranslation = approachSupplier.get().getTranslation();
-                double distanceToApproach = currentTranslation.getDistance(approachTranslation);
+                Pose2d approachPose = approachSupplier.get();
+                Pose2d robotPoseNow = robotPose.get();
+                Translation2d approachTranslation = approachPose.getTranslation();
+                Rotation2d approachRotation = approachPose.getRotation();
 
-                Rotation2d alignmentDirection = approachSupplier.get().getRotation();
+                Translation2d errorInApproachFrame = robotPoseNow.getTranslation()
+                    .minus(approachTranslation)
+                    .rotateBy(approachRotation.unaryMinus());
+                double lateralError = errorInApproachFrame.getY();
+                Logger.recordOutput("AlignDebug/lateralError", lateralError);
 
-                // Find lateral distance from goal
-                Translation2d goalTranslation = new Translation2d(
-                    alignmentDirection.getCos() * distanceToApproach + approachTranslation.getX(),
-                    alignmentDirection.getSin() * distanceToApproach + approachTranslation.getY());
+                double lateralCommand =
+                    MathUtil.applyDeadband(alignController.calculate(lateralError), 0.05);
+                if (Math.abs(lateralCommand) < 1e-4) {
+                    alignController.reset(lateralError);
+                }
+                Logger.recordOutput("AlignDebug/lateralCommand", lateralCommand);
 
-                Translation2d robotToGoal = currentTranslation.minus(goalTranslation);
-                double distanceToGoal =
-                    Math.hypot(robotToGoal.getX(), robotToGoal.getY());
+                Rotation2d lateralDirection = approachRotation.rotateBy(Rotation2d.kCCW_90deg);
+                Translation2d offsetVector = new Translation2d(
+                    lateralDirection.getCos() * lateralCommand,
+                    lateralDirection.getSin() * lateralCommand);
 
-                // Calculate lateral linear velocity
-                Translation2d offsetVector =
-                    new Translation2d(alignController.calculate(distanceToGoal), 0)
-                        .rotateBy(robotToGoal.getAngle());
-
-                Logger.recordOutput("AlignDebug/distanceToGoal", distanceToGoal);
-
-                // Calculate total linear velocity
                 Translation2d linearVelocity =
-                    getLinearVelocityFromJoysticks(0,
-                        ySupplier.getAsDouble()).rotateBy(
-                            approachSupplier.get().getRotation()).rotateBy(Rotation2d.kCCW_90deg)
-                            .plus(offsetVector);
-
-                // To reduce oscillation when not moving we eliminate close x movement
-                Logger.recordOutput("AlignDebug/linearVelocityIN", linearVelocity);
-                if (Math.abs(linearVelocity.getY()) < 0.4) {
-                    Logger.recordOutput("AlignDebug/linearVY", linearVelocity.getY());
-                    if (Math.abs(linearVelocity.getX()) < 0.4) {
-                        linearVelocity = new Translation2d(0, linearVelocity.getY());
-                    }
-                }                
-                Logger.recordOutput("AlignDebug/linearVelocityOUT", linearVelocity);
+                    getLinearVelocityFromJoysticks(0, ySupplier.getAsDouble())
+                        .rotateBy(approachRotation)
+                        .rotateBy(Rotation2d.kCCW_90deg)
+                        .plus(offsetVector);
 
                 // Calculate angular speed
                 double omega =
                     angleController.calculate(
-                        drive.getRotation().getRadians(), approachSupplier.get().getRotation()
-                            .rotateBy(Rotation2d.k180deg).getRadians());
+                        drive.getRotation().getRadians(),
+                        approachRotation.rotateBy(Rotation2d.k180deg).getRadians());
 
                 // Convert to field relative speeds & send command
                 ChassisSpeeds speeds =
@@ -301,7 +290,18 @@ public class DriveCommands {
             drive)
 
             // Reset PID controller when command starts
-            .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+            .beforeStarting(() -> {
+                Pose2d approachPose = approachSupplier.get();
+                Pose2d robotPoseNow = robotPose.get();
+                Translation2d approachTranslation = approachPose.getTranslation();
+                Rotation2d approachRotation = approachPose.getRotation();
+                double lateralError = robotPoseNow.getTranslation()
+                    .minus(approachTranslation)
+                    .rotateBy(approachRotation.unaryMinus())
+                    .getY();
+                alignController.reset(lateralError);
+                angleController.reset(drive.getRotation().getRadians());
+            });
     }
 
     /**
